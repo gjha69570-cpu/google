@@ -1,0 +1,1521 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+  <title>SeatLock 2036 — Chandigarh Smart & Futuristic Seat Booking</title>
+  <style>
+    :root {
+      --bg-page: #f2f6fc;
+      --bg-surface: #ffffff;
+      --bg-elevated: #e8eef8;
+      --text-primary: #091120;
+      --text-secondary: #475569;
+      --border: #cfdbe9;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --accent-soft: rgba(37, 99, 235, 0.12);
+      --neon: #7c3aed;
+      --danger: #dc2626;
+      --success: #16a34a;
+      --warning: #d97706;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --shadow-card: 0 16px 36px -12px rgba(9, 17, 32, 0.12);
+    }
+
+    [data-theme="dark"] {
+      --bg-page: #050912;
+      --bg-surface: #0d1526;
+      --bg-elevated: #16223b;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --border: #20304f;
+      --accent: #3b82f6;
+      --accent-hover: #60a5fa;
+      --accent-soft: rgba(59, 130, 246, 0.16);
+      --neon: #a855f7;
+      --danger: #f87171;
+      --success: #4ade80;
+      --warning: #fbbf24;
+      --shadow-card: 0 20px 44px -14px rgba(0, 0, 0, 0.65);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      overflow-x: hidden;
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg-page);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.5;
+    }
+
+    .hidden { display: none !important; }
+
+    /* Topbar */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      backdrop-filter: blur(14px);
+      background: color-mix(in srgb, var(--bg-surface) 90%, transparent);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .topbar-inner {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 1.1rem;
+    }
+
+    .logo-mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--neon));
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-size: 0.88rem;
+      flex-shrink: 0;
+    }
+
+    .nav-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    /* Layout & Cards */
+    .page {
+      width: 100%;
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 20px 14px 64px;
+      flex: 1;
+    }
+
+    .card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      box-shadow: var(--shadow-card);
+      min-width: 0;
+    }
+
+    @media (min-width: 768px) {
+      .page { padding: 26px 20px 56px; }
+      .card { padding: 22px; }
+    }
+
+    /* Buttons & Inputs */
+    .btn {
+      min-height: 44px;
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: transform 0.1s ease, background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .btn:active { transform: scale(0.98); }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-ghost { background: var(--bg-elevated); color: var(--text-primary); border-color: var(--border); }
+    .btn-ghost:hover { border-color: var(--accent); }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-sm { min-height: 38px; padding: 6px 10px; font-size: 0.8rem; }
+    .btn-block { width: 100%; }
+
+    .field { margin-bottom: 14px; }
+    .label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text-secondary);
+    }
+    .input {
+      width: 100%;
+      min-height: 44px;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--bg-page);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 0.95rem;
+    }
+    .input:focus {
+      outline: 3px solid var(--accent-soft);
+      border-color: var(--accent);
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      background: var(--bg-elevated);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+      max-width: 100%;
+    }
+
+    .future-pill {
+      background: linear-gradient(90deg, rgba(37, 99, 235, 0.15), rgba(124, 58, 237, 0.18));
+      color: var(--neon);
+      border-color: rgba(124, 58, 237, 0.35);
+    }
+
+    .alert-error {
+      color: var(--danger);
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin: 8px 0 12px;
+    }
+
+    /* Login Split View */
+    .login-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+      max-width: 960px;
+      margin: 8px auto;
+    }
+    @media (min-width: 820px) {
+      .login-grid { grid-template-columns: 1.15fr 0.85fr; align-items: stretch; gap: 24px; margin: 20px auto; }
+    }
+    .login-showcase {
+      background: linear-gradient(145deg, #1d4ed8, #7c3aed 60%, #091120);
+      color: #fff;
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    @media (min-width: 768px) {
+      .login-showcase { padding: 30px; }
+    }
+
+    /* Events Grid */
+    .events-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin-top: 16px;
+    }
+    @media (min-width: 680px) {
+      .events-grid { grid-template-columns: repeat(auto-fit, minmax(305px, 1fr)); gap: 20px; }
+    }
+
+    .filter-controls {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      width: 100%;
+    }
+    @media (min-width: 640px) {
+      .filter-controls { display: flex; width: auto; }
+    }
+
+    .poster-wrap {
+      position: relative;
+      height: 165px;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin-bottom: 14px;
+      border: 1px solid var(--border);
+    }
+    .poster-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .poster-overlay {
+      position: absolute;
+      inset: 0;
+      padding: 14px;
+      background: linear-gradient(to top, rgba(5, 9, 18, 0.9), rgba(5, 9, 18, 0.15));
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    /* Seat Selection Workspace */
+    .event-hero {
+      position: relative;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: 16px;
+      min-height: 145px;
+      display: flex;
+      align-items: flex-end;
+      border: 1px solid var(--border);
+    }
+    .event-hero img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .event-hero-content {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      padding: 16px 18px;
+      background: linear-gradient(90deg, rgba(5, 9, 18, 0.92), rgba(5, 9, 18, 0.58));
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 10px;
+    }
+    @media (min-width: 768px) {
+      .event-hero-content { padding: 20px 24px; flex-direction: row; align-items: center; }
+    }
+
+    .seat-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+    @media (min-width: 980px) {
+      .seat-layout { grid-template-columns: 1.65fr 0.85fr; align-items: start; gap: 20px; }
+    }
+
+    .quick-modes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 14px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .stage {
+      text-align: center;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(90deg, transparent, var(--bg-elevated), transparent);
+      border: 1px solid var(--border);
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .map-scroll {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 12px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: var(--bg-page);
+      touch-action: pan-x pan-y pinch-zoom;
+    }
+
+    .seat-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      min-width: max-content;
+    }
+    .seat-row:last-child { margin-bottom: 0; }
+    .row-code {
+      width: 72px;
+      font-size: 0.76rem;
+      font-weight: 800;
+      color: var(--text-secondary);
+      flex-shrink: 0;
+    }
+
+    .seat-btn {
+      width: 46px;
+      height: 46px;
+      min-width: 46px;
+      min-height: 46px;
+      border-radius: 9px;
+      border: 2px solid #16a34a;
+      background: #dcfce7;
+      color: #0f172a;
+      font-weight: 700;
+      font-size: 0.75rem;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      line-height: 1.15;
+    }
+    .seat-btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+    .seat-btn.selected { background: #2563eb; border-color: #1e40af; color: #fff; }
+    .seat-btn.held { background: #fef3c7; border-color: #d97706; color: #78350f; cursor: not-allowed; }
+    .seat-btn.booked { background: #e2e8f0; border-color: #64748b; color: #475569; cursor: not-allowed; }
+    .seat-btn.blocked { background: #fee2e2; border-color: #dc2626; color: #7f1d1d; cursor: not-allowed; }
+    .seat-btn.suggested { box-shadow: 0 0 0 3px #9333ea; }
+    .seat-btn.lost { box-shadow: 0 0 0 3px #dc2626; }
+    .seat-btn.heatmap-hot { background: #ffedd5; border-color: #ea580c; }
+
+    /* Futuristic 2036 Holo-POV Panel */
+    .holo-card {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(124, 58, 237, 0.35);
+      background: linear-gradient(135deg, var(--bg-elevated), color-mix(in srgb, var(--neon) 8%, var(--bg-surface)));
+    }
+    .holo-stage {
+      height: 74px;
+      margin-top: 10px;
+      border-radius: 12px;
+      background: radial-gradient(circle at top, rgba(124, 58, 237, 0.35), #070d1b 75%);
+      border: 1px solid rgba(168, 85, 247, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .holo-beam {
+      width: 58%;
+      height: 28px;
+      border-radius: 8px;
+      background: linear-gradient(90deg, #3b82f6, #a855f7, #ec4899);
+      color: #fff;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      display: grid;
+      place-items: center;
+      transition: transform 0.25s ease;
+    }
+
+    .assistant-card {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: var(--bg-page);
+    }
+    .chips { display: flex; gap: 6px; flex-wrap: wrap; margin: 10px 0 12px; }
+
+    .offer-box {
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+    }
+
+    .narrow-box { max-width: 500px; margin: 12px auto; }
+    .countdown-box {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      border-radius: var(--radius-sm);
+      background: var(--accent-soft);
+      border: 1px solid var(--accent);
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+    .countdown-box.warning {
+      background: rgba(220, 38, 38, 0.14);
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+
+    .pass-card {
+      max-width: 460px;
+      margin: 12px auto;
+      border: 2px dashed var(--accent);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      text-align: center;
+      background: var(--bg-surface);
+      box-shadow: var(--shadow-card);
+    }
+    .qr-placeholder {
+      width: 116px;
+      height: 116px;
+      margin: 14px auto;
+      border: 2px solid var(--text-primary);
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      font-family: monospace;
+      font-weight: 800;
+    }
+
+    .cancel-panel {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 14px;
+      right: 14px;
+      left: 14px;
+      max-width: 460px;
+      margin-left: auto;
+      z-index: 60;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: var(--text-primary);
+      color: var(--bg-page);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      box-shadow: var(--shadow-card);
+      font-size: 0.86rem;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="logo">
+        <span class="logo-mark">SL</span>
+        <span>SeatLock <span class="pill future-pill">2036</span></span>
+      </div>
+      <div class="nav-group">
+        <span class="pill">📍 Chandigarh</span>
+        <span id="walletPill" class="pill hidden">Wallet: ₹0</span>
+        <button id="navEvents" class="btn btn-ghost btn-sm hidden" onclick="go('eventsView')">Events</button>
+        <button id="navBookings" class="btn btn-ghost btn-sm hidden" onclick="go('bookingsView')">Bookings</button>
+        <button class="btn btn-ghost btn-sm" onclick="toggleTheme()">Theme</button>
+        <button id="navLogout" class="btn btn-ghost btn-sm hidden" onclick="logout()">Sign Out</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="page">
+    <!-- 1. LOGIN VIEW -->
+    <section id="loginView" class="login-grid">
+      <div class="login-showcase">
+        <div>
+          <span class="pill" style="background: rgba(255,255,255,0.18); color: #fff; border: none;">
+            CHANDIGARH LIVE VENUES • 2036 VISION
+          </span>
+          <h1 style="margin: 14px 0 8px; font-size: 1.75rem; line-height: 1.2;">
+            Reserve seats across Chandigarh with Holo-POV & Quantum Hold.
+          </h1>
+          <p style="margin: 0; opacity: 0.92; font-size: 0.92rem;">
+            Sign in to explore Chandigarh arenas (Sector 17 Plaza, Elante Convention, Sector 34 Amphitheatre), preview AR stage sightlines, apply offers, and manage pre-event cancellations.
+          </p>
+        </div>
+        <div style="margin-top: 18px; font-size: 0.88rem; opacity: 0.95;">
+          <div>✓ 2036 Holo-Ray Sightline, Group Vibe Sync & Quantum Hold Lock</div>
+          <div>✓ Promo codes (CHD20, FIRSTLOCK) + Pre-event Refund/Voucher/Transfer/Swap</div>
+          <div>✓ Manual tap, keyboard arrows, quick presets & AI Seat Assistant</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 style="margin: 0 0 6px;">Sign In to SeatLock</h2>
+        <p style="margin: 0 0 16px; color: var(--text-secondary); font-size: 0.88rem;">
+          City hub: <strong>Chandigarh Tricity</strong>
+        </p>
+        <form onsubmit="onLoginSubmit(event)">
+          <div class="field">
+            <label class="label" for="loginEmail">Email Address</label>
+            <input id="loginEmail" class="input" type="email" value="gautam@seatlock.chd" required />
+          </div>
+          <div class="field">
+            <label class="label" for="loginPassword">Password</label>
+            <input id="loginPassword" class="input" type="password" value="seatlock123" required />
+          </div>
+          <p id="loginErr" class="alert-error hidden"></p>
+          <button id="loginBtn" type="submit" class="btn btn-primary btn-block">
+            Sign In & Explore Chandigarh →
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- 2. CHANDIGARH EVENTS VIEW -->
+    <section id="eventsView" class="hidden">
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap;">
+        <div>
+          <span id="sessionPill" class="pill">Signed in</span>
+          <span class="pill future-pill">Chandigarh</span>
+          <h1 style="margin: 6px 0 4px; font-size: 1.5rem;">Events in Chandigarh</h1>
+          <p style="margin: 0; font-size: 0.88rem; color: var(--text-secondary);">Offers: <strong>CHD20</strong> (20% off 2+ seats) • <strong>FIRSTLOCK</strong> (₹100 off)</p>
+        </div>
+        <div class="filter-controls">
+          <input id="searchBox" class="input" type="search" placeholder="Search Sector 17, Elante..." oninput="renderEvents()" />
+          <input id="dateBox" class="input" type="date" onchange="renderEvents()" />
+        </div>
+      </div>
+      <div id="eventsContainer" class="events-grid"></div>
+    </section>
+
+    <!-- 3. SEAT MAP + BOOKING MODES + 2036 FEATURES + AI ASSISTANT -->
+    <section id="seatsView" class="hidden">
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;">
+        <button class="btn btn-ghost btn-sm" onclick="go('eventsView')">← Events</button>
+        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+          <button id="heatmapBtn" class="btn btn-ghost btn-sm" onclick="toggleHeatmap()">🔥 Heatmap: OFF</button>
+          <button id="shieldBtn" class="btn btn-ghost btn-sm" onclick="toggleAutoShield()">🛡️ Swap Shield: ON</button>
+          <button id="vibeBtn" class="btn btn-ghost btn-sm" onclick="toggleGroupVibe()">🧬 Vibe Sync: ON</button>
+          <button class="btn btn-ghost btn-sm" onclick="simulateConflictDemo()">⚡ Conflict</button>
+        </div>
+      </div>
+
+      <div id="selectedEventHero" class="event-hero"></div>
+
+      <div class="legend">
+        <span class="pill">✓ Available</span>
+        <span class="pill">● Selected</span>
+        <span class="pill">⏳ Held</span>
+        <span class="pill">✕ Booked</span>
+        <span class="pill">■ Blocked</span>
+        <span class="pill">★ AI Suggested</span>
+      </div>
+
+      <div class="seat-layout">
+        <div class="card">
+          <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px;">
+            BOOKING MODES (TAP SEATS, ARROWS + ENTER, OR PRESETS):
+          </div>
+          <div class="quick-modes">
+            <button type="button" class="btn btn-ghost btn-sm" onclick="quickPick('pair')">2 Together</button>
+            <button type="button" class="btn btn-ghost btn-sm" onclick="quickPick('center')">Center View</button>
+            <button type="button" class="btn btn-ghost btn-sm" onclick="quickPick('vip')">Front VIP</button>
+            <button type="button" class="btn btn-ghost btn-sm" onclick="quickPick('aisle')">Aisle</button>
+            <button type="button" class="btn btn-ghost btn-sm" onclick="quickPick('budget')">Best Value</button>
+            <button type="button" class="btn btn-ghost btn-sm" onclick="quickPick('four')">4 Group</button>
+            <button type="button" class="btn btn-ghost btn-sm" onclick="quickPick('clear')">Clear</button>
+          </div>
+
+          <div class="stage">STAGE / HOLO-SCREEN (CHANDIGARH ARENA)</div>
+          <div id="seatMapBox" class="map-scroll" role="grid" aria-label="Interactive seat map"></div>
+
+          <!-- 2036 Futuristic Feature: Holo-Ray Sightline & Acoustic Projection -->
+          <div class="holo-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
+              <div>
+                <span class="pill future-pill">2036 HOLO-RAY & AR VISOR</span>
+                <strong id="povTitle" style="display: block; margin-top: 4px; font-size: 0.92rem;">Holo-POV from Seat B2</strong>
+              </div>
+              <span class="pill" id="povMetrics">Sightline: 95% • Acoustic: 96%</span>
+            </div>
+            <div class="holo-stage">
+              <div id="povStageBar" class="holo-beam">HOLO STAGE RAY</div>
+            </div>
+          </div>
+
+          <!-- AI Seat Assistant -->
+          <div class="assistant-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px; flex-wrap: wrap;">
+              <strong>AI Seat Assistant</strong>
+              <span class="pill">AI-generated • Manual use</span>
+            </div>
+            <div class="chips">
+              <button type="button" class="btn btn-ghost btn-sm" onclick="runAssistant('2 seats near stage')">Near stage</button>
+              <button type="button" class="btn btn-ghost btn-sm" onclick="runAssistant('aisle seats')">Aisle</button>
+              <button type="button" class="btn btn-ghost btn-sm" onclick="runAssistant('cheapest seats')">Cheapest</button>
+              <button type="button" class="btn btn-ghost btn-sm" onclick="runAssistant('4 seats together')">4 together</button>
+            </div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <input
+                id="assistantInput"
+                class="input"
+                style="flex: 1; min-width: 170px;"
+                placeholder='Ask AI, e.g., "2 seats near stage"'
+              />
+              <button id="aiAskBtn" type="button" class="btn btn-primary" onclick="runAssistant()">Recommend</button>
+              <button id="aiStopBtn" type="button" class="btn btn-ghost hidden" onclick="stopAssistant()">Stop</button>
+            </div>
+            <p id="aiStatusText" class="hidden" style="margin: 10px 0 0; font-size: 0.85rem; color: var(--text-secondary);"></p>
+            <div id="assistantOutput" class="hidden" style="margin-top: 12px;">
+              <p id="assistantReason" style="margin: 0 0 10px; font-size: 0.88rem;"></p>
+              <button type="button" class="btn btn-primary btn-sm" onclick="applyAssistantSeats()">
+                Use these seats
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Summary, 2036 Telemetry & Offers Sidebar -->
+        <aside class="card">
+          <h2 style="margin: 0 0 6px; font-size: 1.2rem;">Booking Summary</h2>
+          <p id="summaryEventLabel" style="margin: 0 0 12px; font-size: 0.86rem; color: var(--text-secondary);"></p>
+          <div class="meta-row"><span>City Hub</span><strong>Chandigarh</strong></div>
+          <div class="meta-row"><span>Selected (Max 4)</span><strong id="summarySeats">None</strong></div>
+          <div class="meta-row"><span>Group Vibe Match</span><strong id="summaryVibe">98% Sync</strong></div>
+          <div class="meta-row"><span>Quantum Hold Key</span><strong id="summaryQuantum">Ready</strong></div>
+          <div class="meta-row"><span>Subtotal</span><strong>₹<span id="summarySubtotal">0</span></strong></div>
+          <div class="meta-row"><span>Offer Discount</span><strong style="color: var(--success);">-₹<span id="summaryDiscount">0</span></strong></div>
+
+          <div class="offer-box">
+            <div style="font-size: 0.78rem; font-weight: 700; margin-bottom: 6px;">CHANDIGARH PASS OFFERS</div>
+            <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px;">
+              <button type="button" class="btn btn-ghost btn-sm" onclick="applyOfferCode('CHD20')">CHD20 (20%)</button>
+              <button type="button" class="btn btn-ghost btn-sm" onclick="applyOfferCode('FIRSTLOCK')">FIRSTLOCK (-₹100)</button>
+              <button type="button" class="btn btn-ghost btn-sm" onclick="applyOfferCode('NONE')">Clear</button>
+            </div>
+            <div style="display: flex; gap: 6px;">
+              <input id="promoInput" class="input" style="min-height: 40px; padding: 6px 10px; font-size: 0.85rem;" placeholder="Enter promo code..." />
+              <button type="button" class="btn btn-ghost btn-sm" onclick="applyOfferCode(document.getElementById('promoInput').value)">Apply</button>
+            </div>
+            <p id="offerStatus" style="margin: 6px 0 0; font-size: 0.8rem; color: var(--text-secondary);">No promo applied</p>
+          </div>
+
+          <div class="meta-row" style="padding-top: 12px; margin-top: 12px; border-top: 1px solid var(--border); font-size: 1.15rem; color: var(--text-primary);">
+            <span>Net Total</span>
+            <strong>₹<span id="summaryTotal">0</span></strong>
+          </div>
+          <p id="seatFeedback" class="alert-error hidden"></p>
+          <button type="button" class="btn btn-primary btn-block" onclick="startHold()">
+            Quantum Hold Seats (5:00) →
+          </button>
+        </aside>
+      </div>
+    </section>
+
+    <!-- 4. CHECKOUT VIEW -->
+    <section id="checkoutView" class="card narrow-box hidden">
+      <h1 style="margin: 0 0 14px; font-size: 1.4rem;">Checkout & Hold Timer</h1>
+      <div id="countdownBox" class="countdown-box">
+        <span>Hold Expires In</span>
+        <span id="countdownClock">05:00</span>
+      </div>
+      <div class="meta-row"><span>Event</span><strong id="chkEventTitle"></strong></div>
+      <div class="meta-row"><span>Chandigarh Venue</span><span id="chkVenue"></span></div>
+      <div class="meta-row"><span>Seats</span><strong id="chkSeatList"></strong></div>
+      <div class="meta-row"><span>Applied Offer</span><strong id="chkOffer">None</strong></div>
+      <div class="meta-row" style="padding-top: 12px; margin-top: 10px; border-top: 1px solid var(--border); font-size: 1.15rem; color: var(--text-primary);">
+        <span>Net Payable</span>
+        <strong>₹<span id="chkAmount">0</span></strong>
+      </div>
+      <button type="button" class="btn btn-primary btn-block" style="margin: 14px 0 10px;" onclick="completeBooking()">
+        Confirm & Issue Holo-Pass
+      </button>
+      <button type="button" class="btn btn-ghost btn-block" onclick="cancelHold()">
+        Back / Cancel Hold
+      </button>
+    </section>
+
+    <!-- 5. TICKET CONFIRMATION VIEW -->
+    <section id="successView" class="hidden">
+      <div class="pass-card">
+        <img id="passBannerImg" alt="Event pass artwork" style="width: 100%; height: 110px; object-fit: cover; border-radius: 12px; margin-bottom: 12px;" />
+        <span class="pill" id="passCode">CONFIRMED</span>
+        <h1 style="margin: 10px 0 4px; font-size: 1.35rem;" id="passEvent"></h1>
+        <p style="margin: 0; color: var(--text-secondary); font-size: 0.88rem;" id="passSchedule"></p>
+        <div class="qr-placeholder" id="passQr">PASS QR</div>
+        <p style="margin: 0 0 16px; font-size: 0.9rem;">
+          Seats: <strong id="passSeats"></strong> • Paid: <strong>₹<span id="passPaid">0</span></strong>
+        </p>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button type="button" class="btn btn-ghost" style="flex: 1;" onclick="showToast('Event added to your calendar!')">
+            Add to Calendar
+          </button>
+          <button type="button" class="btn btn-primary" style="flex: 1;" onclick="go('bookingsView')">
+            View Bookings
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. MY BOOKINGS VIEW -->
+    <section id="bookingsView" class="hidden">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+        <div>
+          <h1 style="margin: 0 0 4px; font-size: 1.5rem;">My Bookings</h1>
+          <p style="margin: 0; font-size: 0.88rem; color: var(--text-secondary);">Cancel before event start via Full Refund, Credit Voucher, Friend Transfer, or Event Swap.</p>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button id="tabUpcoming" class="btn btn-primary btn-sm" onclick="switchBookingTab('upcoming')">Upcoming</button>
+          <button id="tabPast" class="btn btn-ghost btn-sm" onclick="switchBookingTab('past')">Past</button>
+        </div>
+      </div>
+      <div id="bookingsList" class="events-grid"></div>
+    </section>
+  </main>
+
+  <div id="toastBox" class="toast hidden" role="status">
+    <span id="toastText"></span>
+    <button class="btn btn-ghost btn-sm" onclick="hideToast()">Dismiss</button>
+  </div>
+
+  <script>
+    function makePosterUri(c1, c2, label, shape) {
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="400" viewBox="0 0 800 400">
+        <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${c1}"/><stop offset="100%" stop-color="${c2}"/></linearGradient></defs>
+        <rect width="800" height="400" fill="url(#g)"/>
+        <circle cx="670" cy="95" r="140" fill="rgba(255,255,255,0.10)"/>
+        <circle cx="130" cy="340" r="180" fill="rgba(255,255,255,0.08)"/>
+        <text x="680" y="340" font-family="system-ui,sans-serif" font-size="96" font-weight="800" fill="rgba(255,255,255,0.14)" text-anchor="end">${shape}</text>
+        <text x="48" y="88" font-family="system-ui,sans-serif" font-size="22" font-weight="700" fill="rgba(255,255,255,0.75)" letter-spacing="4">${label}</text>
+      </svg>`;
+      return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
+    }
+
+    const EVENTS = [
+      {
+        id: "chd-1",
+        tag: "TECH & AI SUMMIT • CHANDIGARH",
+        title: "Tricity AI & Quantum Expo 2036",
+        date: "2026-12-05",
+        time: "10:30 AM",
+        venue: "Elante Convention Hall, Chandigarh",
+        price: 450,
+        seatsLeft: 21,
+        image: makePosterUri("#1d4ed8", "#091120", "CHANDIGARH EXPO", "AI")
+      },
+      {
+        id: "chd-2",
+        tag: "LIVE ARENA • SECTOR 17",
+        title: "Sector 17 Plaza Synth & Sound Night",
+        date: "2026-12-12",
+        time: "07:30 PM",
+        venue: "Sector 17 Plaza Arena, Chandigarh",
+        price: 600,
+        seatsLeft: 20,
+        image: makePosterUri("#7c3aed", "#1e1b4b", "SECTOR 17 STAGE", "♪")
+      },
+      {
+        id: "chd-3",
+        tag: "STAGE & COMEDY • SECTOR 34",
+        title: "Chandigarh Standup & Spotlight",
+        date: "2026-12-20",
+        time: "06:00 PM",
+        venue: "Sector 34 Open Amphitheatre, Chandigarh",
+        price: 350,
+        seatsLeft: 22,
+        image: makePosterUri("#0d9488", "#042f2e", "SECTOR 34 HALL", "★")
+      }
+    ];
+
+    let activeUser = "";
+    let walletCredit = 0;
+    let currentEvent = EVENTS[0];
+    let seatPool = [];
+    let chosenIds = new Set();
+    let aiIds = [];
+    let lostSeatId = null;
+    let activeOffer = "NONE";
+    let bookingMethod = "Manual Selection";
+    let heatmapEnabled = false;
+    let autoShieldEnabled = true;
+    let groupVibeEnabled = true;
+    let countdownTimer = null;
+    let livePollTimer = null;
+    let aiTimer = null;
+    let secondsLeft = 300;
+    let bookingTab = "upcoming";
+    let openCancelId = null;
+    let savedBookings = [
+      {
+        id: "CHD-2081",
+        eventTitle: "Tricity AI & Quantum Expo 2036",
+        schedule: "2026-12-05 • 10:30 AM",
+        venue: "Elante Convention Hall, Chandigarh",
+        seats: ["B2", "B3"],
+        total: 900,
+        status: "upcoming"
+      },
+      {
+        id: "CHD-1042",
+        eventTitle: "Chandigarh Tech Mixer",
+        schedule: "2026-09-14 • 04:00 PM",
+        venue: "Sector 17 Plaza Arena, Chandigarh",
+        seats: ["C1"],
+        total: 350,
+        status: "past"
+      }
+    ];
+
+    function updateWalletBadge() {
+      const pill = document.getElementById("walletPill");
+      if (!activeUser) {
+        pill.classList.add("hidden");
+        return;
+      }
+      pill.classList.remove("hidden");
+      pill.textContent = `Wallet: ₹${walletCredit}`;
+    }
+
+    function toggleTheme() {
+      const html = document.documentElement;
+      html.dataset.theme = html.dataset.theme === "dark" ? "" : "dark";
+    }
+
+    function showToast(msg) {
+      document.getElementById("toastText").textContent = msg;
+      document.getElementById("toastBox").classList.remove("hidden");
+    }
+
+    function hideToast() {
+      document.getElementById("toastBox").classList.add("hidden");
+    }
+
+    function go(viewId) {
+      ["loginView", "eventsView", "seatsView", "checkoutView", "successView", "bookingsView"]
+        .forEach(id => document.getElementById(id).classList.add("hidden"));
+      document.getElementById(viewId).classList.remove("hidden");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      if (viewId !== "seatsView") clearInterval(livePollTimer);
+      if (viewId === "bookingsView") renderBookings();
+    }
+
+    function onLoginSubmit(e) {
+      e.preventDefault();
+      const email = document.getElementById("loginEmail").value.trim();
+      const pass = document.getElementById("loginPassword").value;
+      const err = document.getElementById("loginErr");
+      const btn = document.getElementById("loginBtn");
+
+      if (!email.includes("@") || pass.length < 6) {
+        err.textContent = "Please enter a valid email and at least 6 characters for password.";
+        err.classList.remove("hidden");
+        return;
+      }
+      if (pass === "wrong") {
+        err.textContent = "Incorrect password. Please try again.";
+        err.classList.remove("hidden");
+        return;
+      }
+
+      err.classList.add("hidden");
+      btn.disabled = true;
+      btn.textContent = "Signing in...";
+
+      setTimeout(() => {
+        btn.disabled = false;
+        btn.textContent = "Sign In & Explore Chandigarh →";
+        activeUser = email;
+        document.getElementById("sessionPill").textContent = "Signed in: " + email;
+        ["navEvents", "navBookings", "navLogout"].forEach(id =>
+          document.getElementById(id).classList.remove("hidden")
+        );
+        updateWalletBadge();
+        renderEvents();
+        go("eventsView");
+      }, 450);
+    }
+
+    function logout() {
+      activeUser = "";
+      ["navEvents", "navBookings", "navLogout", "walletPill"].forEach(id =>
+        document.getElementById(id).classList.add("hidden")
+      );
+      go("loginView");
+    }
+
+    function renderEvents() {
+      const q = document.getElementById("searchBox").value.toLowerCase();
+      const dateVal = document.getElementById("dateBox").value;
+      const box = document.getElementById("eventsContainer");
+      box.innerHTML = "";
+
+      const list = EVENTS.filter(ev => {
+        const matchText = ev.title.toLowerCase().includes(q) || ev.venue.toLowerCase().includes(q);
+        const matchDate = !dateVal || ev.date === dateVal;
+        return matchText && matchDate;
+      });
+
+      if (list.length === 0) {
+        box.innerHTML = `<div class="card"><p style="margin:0">No Chandigarh events match your filter.</p></div>`;
+        return;
+      }
+
+      list.forEach(ev => {
+        const card = document.createElement("article");
+        card.className = "card";
+        card.innerHTML = `
+          <div class="poster-wrap">
+            <img src="${ev.image}" alt="${ev.title} poster" />
+            <div class="poster-overlay">
+              <span class="pill" style="background: rgba(255,255,255,0.2); color: #fff; border: none; width: max-content;">
+                ${ev.tag}
+              </span>
+              <strong style="font-size: 1.1rem; line-height: 1.25;">${ev.title}</strong>
+            </div>
+          </div>
+          <div class="meta-row"><span>Date & Time</span><strong>${ev.date} • ${ev.time}</strong></div>
+          <div class="meta-row"><span>Location</span><strong>${ev.venue}</strong></div>
+          <div class="meta-row"><span>Availability</span><span class="pill">${ev.seatsLeft} seats left</span></div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin: 12px 0 14px; padding-top: 10px; border-top: 1px solid var(--border);">
+            <span class="pill future-pill">Holo-AR Ready</span>
+            <strong style="font-size: 1.15rem;">From ₹${ev.price}</strong>
+          </div>
+          <button type="button" class="btn btn-primary btn-block">Select Seats →</button>
+        `;
+        card.querySelector("button").onclick = () => openSeatMap(ev);
+        box.appendChild(card);
+      });
+    }
+
+    function computeTotals() {
+      const selectedList = seatPool.filter(s => chosenIds.has(s.id));
+      const subtotal = selectedList.reduce((acc, s) => acc + s.price, 0);
+      let discount = 0;
+
+      if (subtotal > 0) {
+        if (activeOffer === "CHD20" && selectedList.length >= 2) {
+          discount = Math.round(subtotal * 0.2);
+        } else if (activeOffer === "FIRSTLOCK") {
+          discount = Math.min(100, subtotal);
+        }
+      }
+      const netTotal = Math.max(0, subtotal - discount);
+      return { selectedList, subtotal, discount, netTotal };
+    }
+
+    function applyOfferCode(rawCode) {
+      const code = (rawCode || "").trim().toUpperCase();
+      const statusEl = document.getElementById("offerStatus");
+      if (!code || code === "NONE") {
+        activeOffer = "NONE";
+        statusEl.textContent = "No promo applied";
+      } else if (code === "CHD20") {
+        if (chosenIds.size < 2) {
+          statusEl.textContent = "CHD20 requires at least 2 selected seats (20% off).";
+        } else {
+          activeOffer = "CHD20";
+          statusEl.textContent = "Applied CHD20: 20% off 2+ seats";
+        }
+      } else if (code === "FIRSTLOCK") {
+        activeOffer = "FIRSTLOCK";
+        statusEl.textContent = "Applied FIRSTLOCK: ₹100 instant discount";
+      } else {
+        activeOffer = "NONE";
+        statusEl.textContent = "Invalid code. Try CHD20 or FIRSTLOCK.";
+      }
+      renderSeats();
+    }
+
+    function openSeatMap(ev) {
+      currentEvent = ev;
+      chosenIds.clear();
+      aiIds = [];
+      lostSeatId = null;
+      activeOffer = "NONE";
+      document.getElementById("promoInput").value = "";
+      document.getElementById("offerStatus").textContent = "No promo applied";
+      bookingMethod = "Manual Selection";
+      document.getElementById("assistantOutput").classList.add("hidden");
+      document.getElementById("seatFeedback").classList.add("hidden");
+
+      const hero = document.getElementById("selectedEventHero");
+      hero.innerHTML = `
+        <img src="${ev.image}" alt="${ev.title} banner" />
+        <div class="event-hero-content">
+          <div>
+            <span class="pill" style="background: rgba(255,255,255,0.2); color: #fff; border: none;">${ev.tag}</span>
+            <h1 style="margin: 8px 0 4px; font-size: 1.35rem;">${ev.title}</h1>
+            <p style="margin: 0; opacity: 0.92; font-size: 0.86rem;">${ev.date} at ${ev.time} • ${ev.venue}</p>
+          </div>
+          <span class="pill" style="background: rgba(255,255,255,0.2); color: #fff; border: none;">
+            Std ₹${ev.price} • VIP ₹${ev.price + 100}
+          </span>
+        </div>
+      `;
+
+      document.getElementById("summaryEventLabel").textContent = "Event: " + ev.title;
+
+      seatPool = [];
+      ["A", "B", "C", "D"].forEach((row, rIdx) => {
+        for (let col = 1; col <= 6; col++) {
+          let status = "available";
+          if (rIdx === 0 && col === 3) status = "booked";
+          if (rIdx === 1 && col === 4) status = "held";
+          if (rIdx === 3 && col === 1) status = "blocked";
+          seatPool.push({
+            id: row + col,
+            row,
+            col,
+            price: rIdx === 0 ? ev.price + 100 : ev.price,
+            status
+          });
+        }
+      });
+
+      clearInterval(livePollTimer);
+      livePollTimer = setInterval(() => {
+        const candidates = seatPool.filter(s => s.status === "available" && !chosenIds.has(s.id));
+        if (candidates.length > 4 && Math.random() < 0.35) {
+          const taken = candidates[Math.floor(Math.random() * candidates.length)];
+          taken.status = "held";
+          renderSeats();
+        }
+      }, 5000);
+
+      updatePovPreview(seatPool[1]);
+      renderSeats();
+      go("seatsView");
+    }
+
+    function toggleHeatmap() {
+      heatmapEnabled = !heatmapEnabled;
+      document.getElementById("heatmapBtn").textContent = heatmapEnabled
+        ? "🔥 Heatmap: ON"
+        : "🔥 Heatmap: OFF";
+      renderSeats();
+    }
+
+    function toggleAutoShield() {
+      autoShieldEnabled = !autoShieldEnabled;
+      document.getElementById("shieldBtn").textContent = autoShieldEnabled
+        ? "🛡️ Swap Shield: ON"
+        : "🛡️ Swap Shield: OFF";
+    }
+
+    function toggleGroupVibe() {
+      groupVibeEnabled = !groupVibeEnabled;
+      document.getElementById("vibeBtn").textContent = groupVibeEnabled
+        ? "🧬 Vibe Sync: ON"
+        : "🧬 Vibe Sync: OFF";
+      document.getElementById("summaryVibe").textContent = groupVibeEnabled
+        ? `${Math.min(99, 92 + chosenIds.size * 2)}% Sync`
+        : "Standard";
+    }
+
+    function updatePovPreview(seat) {
+      if (!seat) return;
+      const rowIndex = ["A", "B", "C", "D"].indexOf(seat.row);
+      const centerOffset = (seat.col - 3.5) * 12;
+      const sightline = Math.max(74, 99 - rowIndex * 6 - Math.abs(seat.col - 3.5) * 2.5);
+      const acoustics = Math.max(78, 98 - rowIndex * 4 - Math.abs(seat.col - 3.5) * 2);
+
+      document.getElementById("povTitle").textContent = `Holo-POV from Seat ${seat.id}`;
+      document.getElementById("povMetrics").textContent =
+        `Sightline: ${Math.round(sightline)}% • Acoustic: ${Math.round(acoustics)}%`;
+
+      const stageBar = document.getElementById("povStageBar");
+      const scale = 1.15 - rowIndex * 0.12;
+      stageBar.style.transform = `translateX(${-centerOffset}px) scale(${scale})`;
+    }
+
+    function quickPick(mode) {
+      const avail = seatPool.filter(s => s.status === "available");
+      const feedback = document.getElementById("seatFeedback");
+      feedback.classList.add("hidden");
+      lostSeatId = null;
+
+      if (mode === "clear") {
+        chosenIds.clear();
+        bookingMethod = "Manual Selection";
+        renderSeats();
+        return;
+      }
+
+      let picked = [];
+      if (mode === "pair") {
+        for (const r of ["B", "C", "A", "D"]) {
+          const rowSeats = avail.filter(s => s.row === r);
+          for (let i = 0; i < rowSeats.length - 1; i++) {
+            if (rowSeats[i + 1].col === rowSeats[i].col + 1) {
+              picked = [rowSeats[i], rowSeats[i + 1]];
+              break;
+            }
+          }
+          if (picked.length) break;
+        }
+        bookingMethod = "2 Together";
+      } else if (mode === "center") {
+        picked = avail.filter(s => (s.row === "B" || s.row === "C") && (s.col === 3 || s.col === 4)).slice(0, 2);
+        bookingMethod = "Center View";
+      } else if (mode === "vip") {
+        picked = avail.filter(s => s.row === "A").slice(0, 2);
+        bookingMethod = "Front VIP";
+      } else if (mode === "aisle") {
+        picked = avail.filter(s => s.col === 1 || s.col === 6).slice(0, 2);
+        bookingMethod = "Aisle";
+      } else if (mode === "budget") {
+        picked = [...avail].sort((a, b) => a.price - b.price).slice(0, 2);
+        bookingMethod = "Best Value";
+      } else if (mode === "four") {
+        picked = avail.slice(0, 4);
+        bookingMethod = "4 Group";
+      }
+
+      chosenIds = new Set(picked.map(s => s.id));
+      if (picked[0]) updatePovPreview(picked[0]);
+      renderSeats();
+    }
+
+    function simulateConflictDemo() {
+      if (chosenIds.size === 0) {
+        showToast("Select at least 1 seat first to test a conflict.");
+        return;
+      }
+      const [firstLost] = [...chosenIds];
+      const seatObj = seatPool.find(s => s.id === firstLost);
+      if (seatObj) seatObj.status = "held";
+      chosenIds.delete(firstLost);
+      lostSeatId = firstLost;
+
+      const nearby = seatPool.find(s => s.status === "available" && !chosenIds.has(s.id));
+      const feedback = document.getElementById("seatFeedback");
+
+      if (autoShieldEnabled && nearby) {
+        chosenIds.add(nearby.id);
+        updatePovPreview(nearby);
+        feedback.textContent = `Swap Shield: Seat ${firstLost} was taken, locked nearby seat ${nearby.id}.`;
+      } else {
+        feedback.textContent = `Conflict: Seat ${firstLost} was taken.${
+          nearby ? ` Nearby seat: ${nearby.id}.` : ""
+        }`;
+      }
+      feedback.classList.remove("hidden");
+      renderSeats();
+    }
+
+    function renderSeats() {
+      const box = document.getElementById("seatMapBox");
+      box.innerHTML = "";
+
+      ["A", "B", "C", "D"].forEach((row, rIdx) => {
+        const rowEl = document.createElement("div");
+        rowEl.className = "seat-row";
+        rowEl.setAttribute("role", "row");
+        rowEl.innerHTML = `<span class="row-code">${row} (₹${rIdx === 0 ? currentEvent.price + 100 : currentEvent.price})</span>`;
+
+        seatPool.filter(s => s.row === row).forEach(seat => {
+          const isChosen = chosenIds.has(seat.id);
+          const isSuggested = aiIds.includes(seat.id) && seat.status === "available";
+          const isLost = lostSeatId === seat.id;
+          const isHot = heatmapEnabled && seat.status === "available" && (seat.row === "A" || seat.row === "B");
+          const stateClass = isChosen ? "selected" : seat.status;
+          const icon = isSuggested
+            ? "★"
+            : isChosen
+            ? "●"
+            : isHot
+            ? "🔥"
+            : seat.status === "available"
+            ? "✓"
+            : seat.status === "held"
+            ? "⏳"
+            : seat.status === "booked"
+            ? "✕"
+            : "■";
+
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.dataset.seatId = seat.id;
+          btn.className = `seat-btn ${stateClass}${isSuggested ? " suggested" : ""}${isLost ? " lost" : ""}${isHot && !isChosen ? " heatmap-hot" : ""}`;
+          btn.disabled = seat.status !== "available";
+          btn.setAttribute("aria-label", `Seat ${seat.id}, ₹${seat.price}, ${stateClass}`);
+          btn.innerHTML = `<span>${icon}</span><span>${seat.id}</span>`;
+
+          btn.onmouseenter = () => updatePovPreview(seat);
+
+          btn.onclick = () => {
+            const feedback = document.getElementById("seatFeedback");
+            lostSeatId = null;
+            updatePovPreview(seat);
+            if (chosenIds.has(seat.id)) {
+              chosenIds.delete(seat.id);
+              feedback.classList.add("hidden");
+            } else if (chosenIds.size >= 4) {
+              feedback.textContent = "Maximum 4 seats allowed per booking.";
+              feedback.classList.remove("hidden");
+              return;
+            } else {
+              chosenIds.add(seat.id);
+              bookingMethod = "Manual Selection";
+              feedback.classList.add("hidden");
+            }
+            renderSeats();
+          };
+
+          btn.onkeydown = (e) => {
+            const rows = ["A", "B", "C", "D"];
+            const ri = rows.indexOf(seat.row);
+            let nextId = null;
+            if (e.key === "ArrowRight" && seat.col < 6) nextId = `${seat.row}${seat.col + 1}`;
+            if (e.key === "ArrowLeft" && seat.col > 1) nextId = `${seat.row}${seat.col - 1}`;
+            if (e.key === "ArrowDown" && ri < 3) nextId = `${rows[ri + 1]}${seat.col}`;
+            if (e.key === "ArrowUp" && ri > 0) nextId = `${rows[ri - 1]}${seat.col}`;
+            if (nextId) {
+              e.preventDefault();
+              const target = box.querySelector(`[data-seat-id="${nextId}"]`);
+              if (target) target.focus();
+            }
+          };
+
+          rowEl.appendChild(btn);
+        });
+
+        box.appendChild(rowEl);
+      });
+
+      const { selectedList, subtotal, discount, netTotal } = computeTotals();
+      document.getElementById("summarySeats").textContent =
+        selectedList.map(s => s.id).join(", ") || "None";
+      document.getElementById("summaryVibe").textContent = groupVibeEnabled
+        ? `${Math.min(99, 92 + selectedList.length * 2)}% Sync`
+        : "Standard";
+      document.getElementById("summaryQuantum").textContent =
+        selectedList.length > 0 ? `Q-LOCK-${selectedList.length}X` : "Ready";
+      document.getElementById("summarySubtotal").textContent = subtotal;
+      document.getElementById("summaryDiscount").textContent = discount;
+      document.getElementById("summaryTotal").textContent = netTotal;
+    }
+
+    function runAssistant(preset) {
+      const input = document.getElementById("assistantInput");
+      if (preset) input.value = preset;
+      const query = input.value.trim().toLowerCase();
+      if (!query) return;
+
+      clearTimeout(aiTimer);
+      document.getElementById("assistantOutput").classList.add("hidden");
+      document.getElementById("aiStatusText").textContent = "Analyzing Chandigarh seat map & Holo-POV...";
+      document.getElementById("aiStatusText").classList.remove("hidden");
+      document.getElementById("aiStopBtn").classList.remove("hidden");
+      document.getElementById("aiAskBtn").disabled = true;
+
+      aiTimer = setTimeout(() => {
+        const available = seatPool.filter(s => s.status === "available");
+        let picks = available.slice(0, 2);
+        if (query.includes("4")) picks = available.slice(0, 4);
+        else if (query.includes("aisle")) picks = available.filter(s => s.col === 1 || s.col === 6).slice(0, 2);
+        else if (query.includes("cheap")) picks = [...available].sort((a, b) => a.price - b.price).slice(0, 2);
+
+        aiIds = picks.map(s => s.id).slice(0, 4);
+        document.getElementById("aiStatusText").classList.add("hidden");
+        document.getElementById("aiStopBtn").classList.add("hidden");
+        document.getElementById("aiAskBtn").disabled = false;
+        document.getElementById("assistantReason").textContent =
+          `AI Suggestion: ${aiIds.join(", ")} are open for "${input.value}". Tap "Use these seats" to select.`;
+        document.getElementById("assistantOutput").classList.remove("hidden");
+        if (picks[0]) updatePovPreview(picks[0]);
+        renderSeats();
+      }, 650);
+    }
+
+    function stopAssistant() {
+      clearTimeout(aiTimer);
+      document.getElementById("aiStatusText").textContent = "AI request stopped. Manual seat selection remains active.";
+      document.getElementById("aiStopBtn").classList.add("hidden");
+      document.getElementById("aiAskBtn").disabled = false;
+    }
+
+    function applyAssistantSeats() {
+      chosenIds.clear();
+      aiIds.filter(id => seatPool.some(s => s.id === id && s.status === "available"))
+        .slice(0, 4)
+        .forEach(id => chosenIds.add(id));
+      bookingMethod = "AI Assisted";
+      renderSeats();
+    }
+
+    function startHold() {
+      const feedback = document.getElementById("seatFeedback");
+      if (chosenIds.size === 0) {
+        feedback.textContent = "Please select at least 1 seat before holding.";
+        feedback.classList.remove("hidden");
+        return;
+      }
+
+      const { selectedList, netTotal } = computeTotals();
+      document.getElementById("chkEventTitle").textContent = currentEvent.title;
+      document.getElementById("chkVenue").textContent = currentEvent.venue;
+      document.getElementById("chkSeatList").textContent = selectedList.map(s => s.id).join(", ");
+      document.getElementById("chkOffer").textContent = activeOffer === "NONE" ? "None" : activeOffer;
+      document.getElementById("chkAmount").textContent = netTotal;
+
+      secondsLeft = 300;
+      const box = document.getElementById("countdownBox");
+      box.classList.remove("warning");
+      clearInterval(countdownTimer);
+      countdownTimer = setInterval(() => {
+        secondsLeft--;
+        const mm = String(Math.floor(secondsLeft / 60)).padStart(2, "0");
+        const ss = String(secondsLeft % 60).padStart(2, "0");
+        document.getElementById("countdownClock").textContent = `${mm}:${ss}`;
+        if (secondsLeft <= 60) box.classList.add("warning");
+        if (secondsLeft <= 0) {
+          clearInterval(countdownTimer);
+          showToast("Your 5-minute hold expired. Please select seats again.");
+          go("seatsView");
+        }
+      }, 1000);
+
+      go("checkoutView");
+    }
+
+    function cancelHold() {
+      clearInterval(countdownTimer);
+      go("seatsView");
+    }
+
+    function completeBooking() {
+      clearInterval(countdownTimer);
+      const { selectedList, netTotal } = computeTotals();
+      selectedList.forEach(s => (s.status = "booked"));
+
+      const pass = {
+        id: "CHD-" + Math.floor(1000 + Math.random() * 9000),
+        eventTitle: currentEvent.title,
+        schedule: `${currentEvent.date} • ${currentEvent.time}`,
+        venue: currentEvent.venue,
+        seats: selectedList.map(s => s.id),
+        total: netTotal,
+        status: "upcoming"
+      };
+      savedBookings.unshift(pass);
+
+      document.getElementById("passBannerImg").src = currentEvent.image;
+      document.getElementById("passCode").textContent = "PASS " + pass.id;
+      document.getElementById("passEvent").textContent = pass.eventTitle;
+      document.getElementById("passSchedule").textContent = `${pass.schedule} • ${pass.venue}`;
+      document.getElementById("passQr").textContent = pass.id;
+      document.getElementById("passSeats").textContent = pass.seats.join(", ");
+      document.getElementById("passPaid").textContent = pass.total;
+
+      chosenIds.clear();
+      go("successView");
+    }
+
+    function switchBookingTab(tab) {
+      bookingTab = tab;
+      openCancelId = null;
+      document.getElementById("tabUpcoming").className = `btn btn-sm ${tab === "upcoming" ? "btn-primary" : "btn-ghost"}`;
+      document.getElementById("tabPast").className = `btn btn-sm ${tab === "past" ? "btn-primary" : "btn-ghost"}`;
+      renderBookings();
+    }
+
+    function renderBookings() {
+      const list = document.getElementById("bookingsList");
+      const filtered = savedBookings.filter(b => b.status === bookingTab);
+      if (filtered.length === 0) {
+        list.innerHTML = `<div class="card"><p style="margin: 0; color: var(--text-secondary);">No ${bookingTab} bookings found.</p></div>`;
+        return;
+      }
+      list.innerHTML = filtered.map(b => `
+        <article class="card">
+          <span class="pill">${b.id}</span>
+          <h3 style="margin: 10px 0 6px; font-size: 1.1rem;">${b.eventTitle}</h3>
+          <div class="meta-row"><span>Schedule</span><span>${b.schedule}</span></div>
+          <div class="meta-row"><span>Venue</span><span>${b.venue}</span></div>
+          <div class="meta-row" style="padding-top: 10px; margin-top: 10px; border-top: 1px solid var(--border); color: var(--text-primary);">
+            <span>Seats: <strong>${b.seats.join(", ")}</strong></span>
+            <strong>₹${b.total}</strong>
+          </div>
+          ${b.status === "upcoming" ? `
+            <button class="btn btn-danger btn-sm btn-block" style="margin-top: 12px;" onclick="toggleCancelMenu('${b.id}')">
+              Cancel / Manage Before Event
+            </button>
+            ${openCancelId === b.id ? `
+              <div class="cancel-panel">
+                <div style="font-size:0.8rem; font-weight:700; margin-bottom:8px;">Choose pre-event option for ${b.id}:</div>
+                <div style="display:grid; gap:6px;">
+                  <button class="btn btn-danger btn-sm" onclick="processPreEventAction('${b.id}', 'refund')">1. Full Refund (24h+ Before)</button>
+                  <button class="btn btn-ghost btn-sm" onclick="processPreEventAction('${b.id}', 'voucher')">2. Credit Voucher (+₹${b.total})</button>
+                  <button class="btn btn-ghost btn-sm" onclick="processPreEventAction('${b.id}', 'transfer')">3. Transfer to Friend</button>
+                  <button class="btn btn-ghost btn-sm" onclick="processPreEventAction('${b.id}', 'swap')">4. Swap Event</button>
+                </div>
+              </div>
+            ` : ""}
+          ` : ""}
+        </article>
+      `).join("");
+    }
+
+    function toggleCancelMenu(id) {
+      openCancelId = openCancelId === id ? null : id;
+      renderBookings();
+    }
+
+    function processPreEventAction(id, actionType) {
+      const target = savedBookings.find(b => b.id === id);
+      if (!target) return;
+
+      if (actionType === "refund") {
+        savedBookings = savedBookings.filter(b => b.id !== id);
+        showToast(`Booking ${id} cancelled before event — full ₹${target.total} refund initiated.`);
+      } else if (actionType === "voucher") {
+        walletCredit += target.total;
+        updateWalletBadge();
+        savedBookings = savedBookings.filter(b => b.id !== id);
+        showToast(`Booking ${id} cancelled — ₹${target.total} added to Wallet Credit.`);
+      } else if (actionType === "transfer") {
+        const friendEmail = prompt("Enter friend's email to transfer this Chandigarh pass:");
+        if (!friendEmail) return;
+        savedBookings = savedBookings.filter(b => b.id !== id);
+        showToast(`Pass ${id} transferred to ${friendEmail} before the event.`);
+      } else if (actionType === "swap") {
+        const nextEv = EVENTS.find(e => e.title !== target.eventTitle) || EVENTS[0];
+        target.eventTitle = nextEv.title;
+        target.schedule = `${nextEv.date} • ${nextEv.time}`;
+        target.venue = nextEv.venue;
+        showToast(`Booking ${id} swapped to "${nextEv.title}".`);
+      }
+
+      openCancelId = null;
+      renderBookings();
+    }
+  </script>
+</body>
+</html>
